@@ -1,6 +1,5 @@
 {
   "version": 2,
-  "name": "lcious-nodejs",
   "builds": [
     {
       "src": "index.js",
@@ -9,31 +8,16 @@
   ],
   "routes": [
     {
-      "src": "/assets/(.*)",
-      "dest": "/assets/$1",
-      "headers": {
-        "cache-control": "public, max-age=31536000, immutable"
-      }
-    },
-    {
       "src": "/api/(.*)",
-      "dest": "/index.js"
+      "dest": "index.js"
     },
     {
       "src": "/admin/(.*)",
-      "dest": "/index.js"
+      "dest": "index.js"
     },
     {
       "src": "/(.*)",
-      "dest": "/index.js"
+      "dest": "index.js"
     }
-  ],
-  "env": {
-    "DB_HOST": "localhost",
-    "DB_USERNAME": "root",
-    "DB_PASSWORD": "",
-    "DB_NAME": "lcious",
-    "JWT_SECRET": "lcious_jwt_secret",
-    "SESSION_SECRET": "lcious_session_secret"
-  }
+  ]
 }

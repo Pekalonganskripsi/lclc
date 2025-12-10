@@ -10,17 +10,23 @@ const pool = mysql.createPool({
   database: process.env.DB_NAME || 'lcious',
   waitForConnections: true,
   connectionLimit: 10,
-  queueLimit: 0
+  queueLimit: 0,
+  // Add these options to handle connection issues in serverless environments
+  acquireTimeout: 60000,
+  timeout: 60000,
+  connectTimeout: 60000
 });
 
-// Test the connection
-pool.getConnection()
-  .then(connection => {
-    console.log('Connected to MySQL database');
-    connection.release();
-  })
-  .catch(err => {
-    console.error('Error connecting to MySQL:', err.message);
-  });
+// Test the connection - only in development, not during build
+if (process.env.NODE_ENV !== 'production') {
+  pool.getConnection()
+    .then(connection => {
+      console.log('Connected to MySQL database');
+      connection.release();
+    })
+    .catch(err => {
+      console.error('Error connecting to MySQL:', err.message);
+    });
+}
 
 module.exports = pool;

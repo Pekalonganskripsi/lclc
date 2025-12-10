@@ -69,21 +69,21 @@ const adminController = {
       // Top LCs by booking count
       const [topLCsRows] = await db.execute(`
         SELECT lcs.name, COUNT(bookings.lc_id) as booking_count, SUM(bookings.total_amount) as total_revenue
-        FROM lcs 
-        LEFT JOIN bookings ON lcs.lc_id = bookings.lc_id 
-        WHERE bookings.status = 'Confirmed' 
-        GROUP BY lcs.lc_id 
-        ORDER BY booking_count DESC 
+        FROM lcs
+        LEFT JOIN bookings ON lcs.lc_id = bookings.lc_id
+        WHERE bookings.status = 'Confirmed'
+        GROUP BY lcs.lc_id
+        ORDER BY booking_count DESC
         LIMIT 10
       `);
 
       // Revenue by date (last 7 days)
       const [revenueByDateRows] = await db.execute(`
-        SELECT DATE(created_at) as date, SUM(total_amount) as daily_revenue 
-        FROM bookings 
-        WHERE status = 'Confirmed' 
-        GROUP BY DATE(created_at) 
-        ORDER BY DATE(created_at) DESC 
+        SELECT DATE(created_at) as date, SUM(total_amount) as daily_revenue
+        FROM bookings
+        WHERE status = 'Confirmed'
+        GROUP BY DATE(created_at)
+        ORDER BY DATE(created_at) DESC
         LIMIT 7
       `);
 
@@ -109,7 +109,12 @@ const adminController = {
       });
     } catch (error) {
       console.error('Error fetching reports:', error);
-      res.status(500).json({ error: error.message });
+      // Check if it's a database connection error
+      if (error.code === 'ECONNREFUSED' || error.code === 'ER_ACCESS_DENIED_ERROR') {
+        res.status(500).json({ error: 'Database connection error. Please check configuration.' });
+      } else {
+        res.status(500).json({ error: error.message });
+      }
     }
   },
 
@@ -117,7 +122,7 @@ const adminController = {
   getAllBookings: async (req, res) => {
     try {
       const [rows] = await db.execute(`
-        SELECT b.*, r.name as room_name, l.name as lc_name 
+        SELECT b.*, r.name as room_name, l.name as lc_name
         FROM bookings b
         LEFT JOIN rooms r ON b.room_id = r.room_id
         LEFT JOIN lcs l ON b.lc_id = l.lc_id
@@ -131,7 +136,12 @@ const adminController = {
       });
     } catch (error) {
       console.error('Error fetching all bookings:', error);
-      res.status(500).json({ error: error.message });
+      // Check if it's a database connection error
+      if (error.code === 'ECONNREFUSED' || error.code === 'ER_ACCESS_DENIED_ERROR') {
+        res.status(500).json({ error: 'Database connection error. Please check configuration.' });
+      } else {
+        res.status(500).json({ error: error.message });
+      }
     }
   },
 
@@ -163,7 +173,12 @@ const adminController = {
       });
     } catch (error) {
       console.error('Error updating booking status:', error);
-      res.status(500).json({ error: error.message });
+      // Check if it's a database connection error
+      if (error.code === 'ECONNREFUSED' || error.code === 'ER_ACCESS_DENIED_ERROR') {
+        res.status(500).json({ error: 'Database connection error. Please check configuration.' });
+      } else {
+        res.status(500).json({ error: error.message });
+      }
     }
   },
 
@@ -188,7 +203,12 @@ const adminController = {
       });
     } catch (error) {
       console.error('Error deleting booking:', error);
-      res.status(500).json({ error: error.message });
+      // Check if it's a database connection error
+      if (error.code === 'ECONNREFUSED' || error.code === 'ER_ACCESS_DENIED_ERROR') {
+        res.status(500).json({ error: 'Database connection error. Please check configuration.' });
+      } else {
+        res.status(500).json({ error: error.message });
+      }
     }
   }
 };

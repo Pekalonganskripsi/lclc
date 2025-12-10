@@ -6,7 +6,7 @@ const bookingController = {
   createBooking: async (req, res) => {
     try {
       const { user_id, room_id, lc_id, start_time, duration } = req.body;
-      
+
       // Validate required fields
       if (!user_id || !room_id || !start_time || !duration) {
         return res.status(400).json({ error: 'Missing required fields' });
@@ -37,7 +37,7 @@ const bookingController = {
       // Calculate total amount
       const roomPrice = roomRows[0].price_per_hour;
       let lcFee = 0;
-      
+
       if (lc_id) {
         const [lcRows] = await db.execute(
           'SELECT lc_fee FROM lcs WHERE lc_id = ?',
@@ -76,7 +76,12 @@ const bookingController = {
       });
     } catch (error) {
       console.error('Error creating booking:', error);
-      res.status(500).json({ error: error.message });
+      // Check if it's a database connection error
+      if (error.code === 'ECONNREFUSED' || error.code === 'ER_ACCESS_DENIED_ERROR') {
+        res.status(500).json({ error: 'Database connection error. Please check configuration.' });
+      } else {
+        res.status(500).json({ error: error.message });
+      }
     }
   },
 
@@ -86,7 +91,7 @@ const bookingController = {
       const userId = req.query.user_id;
 
       let query = `
-        SELECT b.*, r.name as room_name, l.name as lc_name, u.email as user_email 
+        SELECT b.*, r.name as room_name, l.name as lc_name, u.email as user_email
         FROM bookings b
         LEFT JOIN rooms r ON b.room_id = r.room_id
         LEFT JOIN lcs l ON b.lc_id = l.lc_id
@@ -110,7 +115,12 @@ const bookingController = {
       });
     } catch (error) {
       console.error('Error fetching bookings:', error);
-      res.status(500).json({ error: error.message });
+      // Check if it's a database connection error
+      if (error.code === 'ECONNREFUSED' || error.code === 'ER_ACCESS_DENIED_ERROR') {
+        res.status(500).json({ error: 'Database connection error. Please check configuration.' });
+      } else {
+        res.status(500).json({ error: error.message });
+      }
     }
   },
 
@@ -118,7 +128,7 @@ const bookingController = {
   getRooms: async (req, res) => {
     try {
       const [rows] = await db.execute('SELECT * FROM rooms ORDER BY price_per_hour ASC');
-      
+
       res.status(200).json({
         success: true,
         rooms: rows,
@@ -126,7 +136,12 @@ const bookingController = {
       });
     } catch (error) {
       console.error('Error fetching rooms:', error);
-      res.status(500).json({ error: error.message });
+      // Check if it's a database connection error
+      if (error.code === 'ECONNREFUSED' || error.code === 'ER_ACCESS_DENIED_ERROR') {
+        res.status(500).json({ error: 'Database connection error. Please check configuration.' });
+      } else {
+        res.status(500).json({ error: error.message });
+      }
     }
   },
 
@@ -134,7 +149,7 @@ const bookingController = {
   getLCs: async (req, res) => {
     try {
       const [rows] = await db.execute('SELECT * FROM lcs WHERE is_available = 1 ORDER BY rating DESC');
-      
+
       res.status(200).json({
         success: true,
         lcs: rows,
@@ -142,7 +157,12 @@ const bookingController = {
       });
     } catch (error) {
       console.error('Error fetching LCs:', error);
-      res.status(500).json({ error: error.message });
+      // Check if it's a database connection error
+      if (error.code === 'ECONNREFUSED' || error.code === 'ER_ACCESS_DENIED_ERROR') {
+        res.status(500).json({ error: 'Database connection error. Please check configuration.' });
+      } else {
+        res.status(500).json({ error: error.message });
+      }
     }
   }
 };
