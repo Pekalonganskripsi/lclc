@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LCious - Karaoke Room & LC Booking</title>
+    <link rel="stylesheet" href="/assets/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar glass-container">
+        <a href="/" class="navbar-brand">
+            <span><i class="fas fa-disco-ball"></i></span>
+            LCious
+        </a>
+        <div class="navbar-links">
+            <a href="/">Home</a>
+            <a href="/public/rooms.html">Rooms</a>
+            <a href="/public/lcs.html">LCs</a>
+            <a href="/public/booking.html">Book Now</a>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero glass-container">
+        <div class="hero-content">
+            <h1 class="neon-text disco-glow">Welcome to LCious</h1>
+            <p>Experience the ultimate karaoke night with our premium rooms and entertainment companions!</p>
+            <div style="margin-top: 25px;">
+                <a href="/public/rooms.html" class="btn-glass btn-primary">
+                    <i class="fas fa-music"></i> Browse Rooms
+                </a>
+                <a href="/public/lcs.html" class="btn-glass btn-secondary">
+                    <i class="fas fa-user-friends"></i> Meet LCs
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features glass-container">
+        <h2 class="neon-text">Why Choose LCious?</h2>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-top: 20px;">
+            <div class="card">
+                <h3><i class="fas fa-star" style="color: var(--gold-highlight);"></i> Premium Rooms</h3>
+                <p>Experience high-quality sound systems and stunning disco-themed interiors.</p>
+            </div>
+            <div class="card">
+                <h3><i class="fas fa-heart" style="color: var(--primary);"></i> Professional LCs</h3>
+                <p>Meet our talented entertainment companions who enhance your karaoke experience.</p>
+            </div>
+            <div class="card">
+                <h3><i class="fas fa-calendar-check" style="color: var(--secondary);"></i> Easy Booking</h3>
+                <p>Quick and simple booking process to reserve your preferred room and LC.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Latest Available Rooms -->
+    <section class="latest-rooms glass-container">
+        <h2 class="neon-text">Featured Rooms</h2>
+        <div id="featured-rooms" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-top: 20px;">
+            <!-- Featured rooms will be loaded dynamically -->
+            <div class="card room-card">
+                <h3 class="card-title">VIP Room A</h3>
+                <div class="card-content">
+                    <p>Capacity: 6 people</p>
+                    <p class="card-price">Rp. 250,000/hour</p>
+                    <div class="status status-available">Available</div>
+                </div>
+            </div>
+            <div class="card room-card">
+                <h3 class="card-title">VIP Room B</h3>
+                <div class="card-content">
+                    <p>Capacity: 8 people</p>
+                    <p class="card-price">Rp. 300,000/hour</p>
+                    <div class="status status-available">Available</div>
+                </div>
+            </div>
+            <div class="card room-card">
+                <h3 class="card-title">Premium Room C</h3>
+                <div class="card-content">
+                    <p>Capacity: 4 people</p>
+                    <p class="card-price">Rp. 150,000/hour</p>
+                    <div class="status status-booked">Booked</div>
+                </div>
+            </div>
+        </div>
+        <div style="text-align: center; margin-top: 20px;">
+            <a href="/public/rooms.html" class="btn-glass btn-primary">View All Rooms</a>
+        </div>
+    </section>
+
+    <!-- Popular LCs -->
+    <section class="popular-lcs glass-container">
+        <h2 class="neon-text">Popular LCs</h2>
+        <div id="popular-lcs" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-top: 20px;">
+            <!-- Popular LCs will be loaded dynamically -->
+            <div class="card lc-card">
+                <h3 class="card-title">Sakura</h3>
+                <div class="card-content">
+                    <div class="rating">
+                        <i class="fas fa-star"></i> 4.8
+                    </div>
+                    <p class="card-price">Rp. 100,000/session</p>
+                    <p class="card-traits">Traits: Energetic, Fun, Flirty</p>
+                    <div class="status status-available">Available</div>
+                </div>
+            </div>
+            <div class="card lc-card">
+                <h3 class="card-title">Luna</h3>
+                <div class="card-content">
+                    <div class="rating">
+                        <i class="fas fa-star"></i> 4.9
+                    </div>
+                    <p class="card-price">Rp. 120,000/session</p>
+                    <p class="card-traits">Traits: Sultry, Elegant, Sweet</p>
+                    <div class="status status-available">Available</div>
+                </div>
+            </div>
+        </div>
+        <div style="text-align: center; margin-top: 20px;">
+            <a href="/public/lcs.html" class="btn-glass btn-secondary">View All LCs</a>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <p>&copy; 2025 LCious. All rights reserved. | Premium Karaoke Experience</p>
+    </footer>
+
+    <script src="/assets/script.js"></script>
+    <script>
+        // Load featured rooms and popular LCs dynamically
+        document.addEventListener('DOMContentLoaded', async function() {
+            try {
+                // Load featured rooms
+                const roomsResponse = await fetch('/api/booking/rooms');
+                if (roomsResponse.ok) {
+                    const roomsData = await roomsResponse.json();
+                    const featuredRoomsContainer = document.getElementById('featured-rooms');
+                    
+                    // Clear existing content
+                    featuredRoomsContainer.innerHTML = '';
+                    
+                    // Show only first 3 rooms as featured
+                    roomsData.rooms.slice(0, 3).forEach(room => {
+                        const roomCard = document.createElement('div');
+                        roomCard.className = 'card room-card';
+                        roomCard.innerHTML = `
+                            <h3 class="card-title">${room.name}</h3>
+                            <div class="card-content">
+                                <p>Capacity: ${room.capacity} people</p>
+                                <p class="card-price">Rp. ${parseInt(room.price_per_hour).toLocaleString()}/hour</p>
+                                <div class="status ${room.status.toLowerCase() === 'available' ? 'status-available' : 'status-booked'}">
+                                    ${room.status}
+                                </div>
+                            </div>
+                        `;
+                        featuredRoomsContainer.appendChild(roomCard);
+                    });
+                }
+                
+                // Load popular LCs
+                const lcsResponse = await fetch('/api/booking/lcs');
+                if (lcsResponse.ok) {
+                    const lcsData = await lcsResponse.json();
+                    const popularLcsContainer = document.getElementById('popular-lcs');
+                    
+                    // Clear existing content
+                    popularLcsContainer.innerHTML = '';
+                    
+                    // Show only first 2 LCs as popular
+                    lcsData.lcs.slice(0, 2).forEach(lc => {
+                        const lcCard = document.createElement('div');
+                        lcCard.className = 'card lc-card';
+                        lcCard.innerHTML = `
+                            <h3 class="card-title">${lc.name}</h3>
+                            <div class="card-content">
+                                <div class="rating">
+                                    <i class="fas fa-star"></i> ${lc.rating.toFixed(1)}
+                                </div>
+                                <p class="card-price">Rp. ${parseInt(lc.lc_fee).toLocaleString()}/session</p>
+                                <p class="card-traits">Traits: ${lc.traits}</p>
+                                <div class="status status-available">Available</div>
+                            </div>
+                        `;
+                        popularLcsContainer.appendChild(lcCard);
+                    });
+                }
+            } catch (error) {
+                console.error('Error loading featured content:', error);
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LCs - LCious</title>
+    <link rel="stylesheet" href="/assets/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar glass-container">
+        <a href="/" class="navbar-brand">
+            <span><i class="fas fa-disco-ball"></i></span>
+            LCious
+        </a>
+        <div class="navbar-links">
+            <a href="/">Home</a>
+            <a href="/public/rooms.html">Rooms</a>
+            <a href="/public/lcs.html">LCs</a>
+            <a href="/public/booking.html">Book Now</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <h1 class="neon-text" style="text-align: center; margin-bottom: 30px;">Available Entertainment Companions</h1>
+        
+        <div id="lcs-container" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 25px;">
+            <!-- LCs will be loaded dynamically -->
+            <div class="card lc-card">
+                <h3 class="card-title">Loading...</h3>
+                <div class="card-content">
+                    <div class="rating">
+                        <i class="fas fa-star"></i> ...
+                    </div>
+                    <p class="card-price">Rp. .../session</p>
+                    <p class="card-traits"><strong>Traits:</strong> ...</p>
+                    <div class="status status-available">...</div>
+                    <div style="margin-top: 20px;">
+                        <a class="btn-glass btn-secondary" style="pointer-events: none;">
+                            <i class="fas fa-calendar-plus"></i> Book with ...
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <p>&copy; 2025 LCious. All rights reserved. | Premium Karaoke Experience</p>
+    </footer>
+
+    <script src="/assets/script.js"></script>
+    <script>
+        // Load LCs dynamically
+        document.addEventListener('DOMContentLoaded', async function() {
+            try {
+                const response = await fetch('/api/booking/lcs');
+                if (response.ok) {
+                    const data = await response.json();
+                    const container = document.getElementById('lcs-container');
+                    
+                    // Clear loading placeholder
+                    container.innerHTML = '';
+                    
+                    data.lcs.forEach(lc => {
+                        const lcCard = document.createElement('div');
+                        lcCard.className = 'card lc-card';
+                        lcCard.innerHTML = `
+                            <h3 class="card-title">${lc.name}</h3>
+                            <div class="card-content">
+                                <div class="rating">
+                                    <i class="fas fa-star"></i> ${lc.rating.toFixed(1)}
+                                </div>
+                                <p class="card-price">Rp. ${parseInt(lc.lc_fee).toLocaleString()}/session</p>
+                                <p class="card-traits"><strong>Traits:</strong> ${lc.traits}</p>
+                                
+                                <div class="status status-available">
+                                    Available
+                                </div>
+                                
+                                <div style="margin-top: 20px;">
+                                    <a href="booking.html?lc=${lc.lc_id}" class="btn-glass btn-secondary">
+                                        <i class="fas fa-calendar-plus"></i> Book with ${lc.name}
+                                    </a>
+                                </div>
+                            </div>
+                        `;
+                        container.appendChild(lcCard);
+                    });
+                } else {
+                    document.getElementById('lcs-container').innerHTML = '<p class="error">Failed to load LCs. Please try again later.</p>';
+                }
+            } catch (error) {
+                console.error('Error loading LCs:', error);
+                document.getElementById('lcs-container').innerHTML = '<p class="error">An error occurred while loading LCs.</p>';
+            }
+        });
+    </script>
+</body>
+</html>

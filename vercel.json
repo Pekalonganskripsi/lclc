@@ -1,0 +1,40 @@
+{
+  "version": 2,
+  "name": "lcious-nodejs",
+  "builds": [
+    {
+      "src": "server.js",
+      "use": "@vercel/node"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "/server.js"
+    },
+    {
+      "src": "/admin/(.*)",
+      "dest": "/server.js"
+    },
+    {
+      "src": "/assets/(.*)",
+      "dest": "/assets/$1"
+    },
+    {
+      "src": "/public/(.*)",
+      "dest": "/public/$1"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/server.js"
+    }
+  ],
+  "env": {
+    "DB_HOST": "localhost",
+    "DB_USERNAME": "root",
+    "DB_PASSWORD": "",
+    "DB_NAME": "lcious",
+    "JWT_SECRET": "lcious_jwt_secret",
+    "SESSION_SECRET": "lcious_session_secret"
+  }
+}

@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Booking Success - LCious</title>
+    <link rel="stylesheet" href="/assets/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar glass-container">
+        <a href="/" class="navbar-brand">
+            <span><i class="fas fa-disco-ball"></i></span>
+            LCious
+        </a>
+        <div class="navbar-links">
+            <a href="/">Home</a>
+            <a href="/public/rooms.html">Rooms</a>
+            <a href="/public/lcs.html">LCs</a>
+            <a href="/public/booking.html">Book Now</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="glass-container" style="text-align: center; padding: 40px;">
+            <h1 class="neon-text" style="font-size: 2.5rem; margin-bottom: 20px;">
+                <i class="fas fa-check-circle" style="color: #00ff64;"></i> Booking Confirmed!
+            </h1>
+            <p style="font-size: 1.2rem; margin-bottom: 30px;">Thank you for your reservation at LCious.</p>
+            
+            <div class="booking-summary glass-container" style="max-width: 600px; margin: 0 auto;">
+                <h2 class="neon-text">Booking Details</h2>
+                <div class="summary-item">
+                    <span>Booking ID:</span>
+                    <span id="booking-id">-</span>
+                </div>
+                <div class="summary-item">
+                    <span>Total Amount:</span>
+                    <span id="total-amount" class="total-amount">-</span>
+                </div>
+                <div class="summary-item">
+                    <span>Status:</span>
+                    <span style="color: #00ff64; font-weight: bold;">Confirmed</span>
+                </div>
+            </div>
+            
+            <div style="margin-top: 30px;">
+                <a href="/" class="btn-glass btn-primary">
+                    <i class="fas fa-home"></i> Back to Home
+                </a>
+                <a href="/public/booking.html" class="btn-glass btn-secondary">
+                    <i class="fas fa-calendar-plus"></i> Make Another Booking
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <p>&copy; 2025 LCious. All rights reserved. | Premium Karaoke Experience</p>
+    </footer>
+
+    <script src="/assets/script.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Get booking data from localStorage
+            const bookingData = JSON.parse(localStorage.getItem('bookingData'));
+            
+            if (bookingData) {
+                document.getElementById('booking-id').textContent = bookingData.bookingId;
+                document.getElementById('total-amount').textContent = 'Rp. ' + parseInt(bookingData.totalAmount).toLocaleString();
+            } else {
+                // If no booking data in localStorage, redirect to home
+                setTimeout(() => {
+                    window.location.href = '/';
+                }, 3000);
+            }
+        });
+    </script>
+</body>
+</html>

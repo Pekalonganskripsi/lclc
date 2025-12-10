@@ -1,0 +1,351 @@
+/* LCious - Disco Glassmorphism Theme */
+/* assets/styles.css */
+
+:root {
+  --primary: #FF0077;
+  --secondary: #00FFFF;
+  --background: #1A0033;
+  --gold-highlight: #FFD700;
+  --text-light: #FFFFFF;
+  --text-secondary: #CCCCCC;
+  --glass-bg: rgba(255, 255, 255, 0.15);
+  --glass-border: rgba(255, 255, 255, 0.18);
+  --glass-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+  background: linear-gradient(135deg, var(--background) 0%, #0d0022 100%);
+  color: var(--text-light);
+  min-height: 100vh;
+  padding: 20px;
+  background-attachment: fixed;
+  background-size: cover;
+  overflow-x: hidden;
+}
+
+/* Glassmorphism Container */
+.glass-container {
+  background: var(--glass-bg);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid var(--glass-border);
+  border-radius: 16px;
+  box-shadow: var(--glass-shadow);
+  padding: 25px;
+  margin: 15px 0;
+}
+
+/* Neon Text Effect */
+.neon-text {
+  text-shadow: 0 0 5px var(--primary), 0 0 10px var(--primary), 0 0 20px var(--primary), 0 0 40px var(--primary);
+  color: var(--text-light);
+}
+
+/* Glassmorphism Button */
+.btn-glass {
+  background: rgba(255, 255, 255, 0.2);
+  border: 1px solid var(--glass-border);
+  border-radius: 50px;
+  padding: 12px 25px;
+  color: var(--text-light);
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: inline-block;
+  text-decoration: none;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.btn-glass:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: translateY(-3px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+  text-shadow: 0 0 8px currentColor;
+}
+
+.btn-primary {
+  background: linear-gradient(45deg, var(--primary), #ff00a0);
+  color: white;
+}
+
+.btn-primary:hover {
+  background: linear-gradient(45deg, #ff00a0, var(--primary));
+  color: white;
+}
+
+.btn-secondary {
+  background: linear-gradient(45deg, var(--secondary), #00ccff);
+  color: var(--background);
+}
+
+.btn-secondary:hover {
+  background: linear-gradient(45deg, #00ccff, var(--secondary));
+  color: var(--background);
+}
+
+/* Navbar */
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 30px;
+  margin-bottom: 30px;
+  border-radius: 16px;
+}
+
+.navbar-brand {
+  font-size: 1.8rem;
+  font-weight: bold;
+  color: var(--text-light);
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+}
+
+.navbar-brand span {
+  color: var(--primary);
+  margin-right: 10px;
+  font-size: 2rem;
+  animation: pulse 2s infinite;
+}
+
+.navbar-links {
+  display: flex;
+  gap: 20px;
+}
+
+.navbar-links a {
+  color: var(--text-light);
+  text-decoration: none;
+  padding: 8px 15px;
+  border-radius: 20px;
+  transition: all 0.3s ease;
+}
+
+.navbar-links a:hover {
+  background: rgba(255, 255, 255, 0.1);
+  text-shadow: 0 0 8px var(--secondary);
+}
+
+/* Card Styles */
+.card {
+  background: var(--glass-bg);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid var(--glass-border);
+  border-radius: 16px;
+  box-shadow: var(--glass-shadow);
+  padding: 20px;
+  margin: 15px 0;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+}
+
+.room-card, .lc-card {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.card-title {
+  font-size: 1.4rem;
+  margin-bottom: 10px;
+  color: var(--text-light);
+}
+
+.card-content {
+  flex-grow: 1;
+}
+
+.card-price {
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: var(--secondary);
+  margin: 10px 0;
+}
+
+.card-traits {
+  margin: 10px 0;
+  color: var(--text-secondary);
+}
+
+.rating {
+  color: var(--gold-highlight);
+  margin: 5px 0;
+}
+
+.status {
+  padding: 5px 12px;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  font-weight: bold;
+}
+
+.status-available {
+  background: rgba(0, 255, 100, 0.2);
+  color: #00ff64;
+}
+
+.status-booked {
+  background: rgba(255, 0, 0, 0.2);
+  color: #ff0000;
+}
+
+/* Form Styles */
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-label {
+  display: block;
+  margin-bottom: 8px;
+  color: var(--text-light);
+  font-weight: 500;
+}
+
+.form-control {
+  width: 100%;
+  padding: 12px 15px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid var(--glass-border);
+  border-radius: 8px;
+  color: var(--text-light);
+  font-size: 1rem;
+  transition: all 0.3s ease;
+}
+
+.form-control:focus {
+  outline: none;
+  border-color: var(--secondary);
+  background: rgba(255, 255, 255, 0.15);
+  box-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
+}
+
+/* Table Styles */
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+}
+
+.table th, .table td {
+  padding: 12px 15px;
+  text-align: left;
+  border-bottom: 1px solid var(--glass-border);
+}
+
+.table th {
+  color: var(--secondary);
+  font-weight: bold;
+}
+
+.table tr:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* Booking Summary */
+.booking-summary {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: 16px;
+  padding: 20px;
+  margin: 20px 0;
+}
+
+.summary-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 0;
+}
+
+.total-amount {
+  font-size: 1.4rem;
+  font-weight: bold;
+  color: var(--primary);
+  padding-top: 15px;
+  border-top: 1px solid var(--glass-border);
+  margin-top: 10px;
+}
+
+/* Footer */
+.footer {
+  text-align: center;
+  padding: 20px;
+  margin-top: 40px;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+/* Animations */
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+  100% { transform: scale(1); }
+}
+
+@keyframes disco-glow {
+  0% { text-shadow: 0 0 5px var(--primary), 0 0 10px var(--primary); }
+  50% { text-shadow: 0 0 10px var(--secondary), 0 0 20px var(--secondary); }
+  100% { text-shadow: 0 0 5px var(--primary), 0 0 10px var(--primary); }
+}
+
+.disco-glow {
+  animation: disco-glow 3s infinite;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .navbar {
+    flex-direction: column;
+    gap: 15px;
+  }
+  
+  .navbar-links {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  
+  .container {
+    padding: 10px;
+  }
+  
+  .glass-container {
+    padding: 15px;
+  }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--primary);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--secondary);
+}
+
+.error {
+  color: #ff6b6b;
+  text-align: center;
+  padding: 10px;
+}

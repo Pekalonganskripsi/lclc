@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rooms - LCious</title>
+    <link rel="stylesheet" href="/assets/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar glass-container">
+        <a href="/" class="navbar-brand">
+            <span><i class="fas fa-disco-ball"></i></span>
+            LCious
+        </a>
+        <div class="navbar-links">
+            <a href="/">Home</a>
+            <a href="/public/rooms.html">Rooms</a>
+            <a href="/public/lcs.html">LCs</a>
+            <a href="/public/booking.html">Book Now</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <h1 class="neon-text" style="text-align: center; margin-bottom: 30px;">Available Karaoke Rooms</h1>
+        
+        <div id="rooms-container" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 25px;">
+            <!-- Rooms will be loaded dynamically -->
+            <div class="card room-card">
+                <h3 class="card-title">Loading...</h3>
+                <div class="card-content">
+                    <p>Capacity: ...</p>
+                    <p class="card-price">Rp. .../hour</p>
+                    <p>Description: ...</p>
+                    <div class="status status-available">...</div>
+                    <div style="margin-top: 20px;">
+                        <a class="btn-glass btn-primary" style="pointer-events: none;">
+                            <i class="fas fa-calendar-plus"></i> Book This Room
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <p>&copy; 2025 LCious. All rights reserved. | Premium Karaoke Experience</p>
+    </footer>
+
+    <script src="/assets/script.js"></script>
+    <script>
+        // Load rooms dynamically
+        document.addEventListener('DOMContentLoaded', async function() {
+            try {
+                const response = await fetch('/api/booking/rooms');
+                if (response.ok) {
+                    const data = await response.json();
+                    const container = document.getElementById('rooms-container');
+                    
+                    // Clear loading placeholder
+                    container.innerHTML = '';
+                    
+                    data.rooms.forEach(room => {
+                        const roomCard = document.createElement('div');
+                        roomCard.className = 'card room-card';
+                        roomCard.innerHTML = `
+                            <h3 class="card-title">${room.name}</h3>
+                            <div class="card-content">
+                                <p><strong>Capacity:</strong> ${room.capacity} people</p>
+                                <p class="card-price">Rp. ${parseInt(room.price_per_hour).toLocaleString()}/hour</p>
+                                <p><strong>Description:</strong> Premium karaoke room with high-quality audio system.</p>
+                                
+                                <div class="status ${room.status.toLowerCase() === 'available' ? 'status-available' : 'status-booked'}">
+                                    ${room.status}
+                                </div>
+                                
+                                <div style="margin-top: 20px;">
+                                    <a href="booking.html?room=${room.room_id}" class="btn-glass btn-primary">
+                                        <i class="fas fa-calendar-plus"></i> Book This Room
+                                    </a>
+                                </div>
+                            </div>
+                        `;
+                        container.appendChild(roomCard);
+                    });
+                } else {
+                    document.getElementById('rooms-container').innerHTML = '<p class="error">Failed to load rooms. Please try again later.</p>';
+                }
+            } catch (error) {
+                console.error('Error loading rooms:', error);
+                document.getElementById('rooms-container').innerHTML = '<p class="error">An error occurred while loading rooms.</p>';
+            }
+        });
+    </script>
+</body>
+</html>

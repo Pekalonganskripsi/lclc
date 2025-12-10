@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - LCious</title>
+    <link rel="stylesheet" href="/assets/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar glass-container">
+        <a href="/" class="navbar-brand">
+            <span><i class="fas fa-disco-ball"></i></span>
+            LCious Admin
+        </a>
+        <div class="navbar-links">
+            <a href="/admin/dashboard.html">Dashboard</a>
+            <a href="/admin/bookings.html">Manage Bookings</a>
+            <a href="/admin/reports.html">Reports</a>
+            <a href="#" id="logout-link">Logout</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <h1 class="neon-text" style="text-align: center; margin-bottom: 30px;">Admin Dashboard</h1>
+        
+        <!-- Stats Overview -->
+        <div id="stats-container" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 30px;">
+            <div class="glass-container" style="text-align: center; padding: 20px;">
+                <div style="font-size: 2rem; color: var(--secondary); margin-bottom: 10px;">
+                    <i class="fas fa-calendar-check"></i>
+                </div>
+                <h3>Total Bookings</h3>
+                <p style="font-size: 1.8rem; font-weight: bold;" id="total-bookings">0</p>
+            </div>
+            
+            <div class="glass-container" style="text-align: center; padding: 20px;">
+                <div style="font-size: 2rem; color: var(--primary); margin-bottom: 10px;">
+                    <i class="fas fa-clock"></i>
+                </div>
+                <h3>Pending</h3>
+                <p style="font-size: 1.8rem; font-weight: bold;" id="pending-bookings">0</p>
+            </div>
+            
+            <div class="glass-container" style="text-align: center; padding: 20px;">
+                <div style="font-size: 2rem; color: #00ff64; margin-bottom: 10px;">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <h3>Confirmed</h3>
+                <p style="font-size: 1.8rem; font-weight: bold;" id="confirmed-bookings">0</p>
+            </div>
+            
+            <div class="glass-container" style="text-align: center; padding: 20px;">
+                <div style="font-size: 2rem; color: var(--gold-highlight); margin-bottom: 10px;">
+                    <i class="fas fa-money-bill-wave"></i>
+                </div>
+                <h3>Total Revenue</h3>
+                <p style="font-size: 1.8rem; font-weight: bold;" id="total-revenue">Rp. 0</p>
+            </div>
+        </div>
+        
+        <!-- Recent Bookings -->
+        <div class="glass-container">
+            <h2 class="neon-text">Recent Bookings</h2>
+            <div id="recent-bookings-container">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Room</th>
+                            <th>LC</th>
+                            <th>Start Time</th>
+                            <th>Duration</th>
+                            <th>Amount</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="recent-bookings-body">
+                        <!-- Recent bookings will be loaded here -->
+                        <tr>
+                            <td colspan="8" style="text-align: center;">Loading bookings...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <!-- Top LCs -->
+        <div class="glass-container" style="margin-top: 30px;">
+            <h2 class="neon-text">Top LCs</h2>
+            <div id="top-lcs-container" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px;">
+                <!-- Top LCs will be loaded here -->
+                <div class="card">
+                    <h3>Loading...</h3>
+                    <p>Bookings: <strong>0</strong></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <p>&copy; 2025 LCious. All rights reserved. | Admin Portal</p>
+    </footer>
+
+    <script src="/assets/script.js"></script>
+    <script>
+        // Check if user is logged in
+        const token = localStorage.getItem('adminToken');
+        if (!token) {
+            window.location.href = '/admin/login.html';
+        }
+
+        // Logout functionality
+        document.getElementById('logout-link').addEventListener('click', function(e) {
+            e.preventDefault();
+            localStorage.removeItem('adminToken');
+            localStorage.removeItem('adminUser');
+            window.location.href = '/admin/login.html';
+        });
+
+        // Fetch and display dashboard data
+        async function loadDashboardData() {
+            try {
+                const bookingsResponse = await fetch('/api/admin/bookings', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                if (bookingsResponse.ok) {
+                    const bookingsData = await bookingsResponse.json();
+                    const bookings = bookingsData.bookings;
+                    
+                    // Update stats
+                    document.getElementById('total-bookings').textContent = bookings.length;
+                    
+                    const pendingCount = bookings.filter(b => b.status === 'Pending').length;
+                    document.getElementById('pending-bookings').textContent = pendingCount;
+                    
+                    const confirmedCount = bookings.filter(b => b.status === 'Confirmed').length;
+                    document.getElementById('confirmed-bookings').textContent = confirmedCount;
+                    
+                    // Calculate total revenue for confirmed bookings
+                    const totalRevenue = bookings
+                        .filter(b => b.status === 'Confirmed')
+                        .reduce((sum, booking) => sum + booking.total_amount, 0);
+                    document.getElementById('total-revenue').textContent = 'Rp. ' + totalRevenue.toLocaleString();
+                    
+                    // Display recent bookings (limit to 10)
+                    const recentBookings = bookings.slice(0, 10);
+                    const recentBookingsBody = document.getElementById('recent-bookings-body');
+                    recentBookingsBody.innerHTML = '';
+                    
+                    recentBookings.forEach(booking => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${booking.booking_id}</td>
+                            <td>${booking.room_name}</td>
+                            <td>${booking.lc_name || 'None'}</td>
+                            <td>${new Date(booking.start_time).toLocaleString()}</td>
+                            <td>${booking.duration_hours}h</td>
+                            <td>Rp. ${parseInt(booking.total_amount).toLocaleString()}</td>
+                            <td>
+                                <span class="status ${booking.status === 'Confirmed' ? 'status-available' : (booking.status === 'Pending' ? 'status-booked' : 'status-booked')}">
+                                    ${booking.status}
+                                </span>
+                            </td>
+                            <td>
+                                <select class="form-control" style="width: auto; display: inline-block; margin-right: 5px;" onchange="updateBookingStatus(${booking.booking_id}, this.value)">
+                                    <option value="Pending" ${booking.status === 'Pending' ? 'selected' : ''}>Pending</option>
+                                    <option value="Confirmed" ${booking.status === 'Confirmed' ? 'selected' : ''}>Confirmed</option>
+                                    <option value="Completed" ${booking.status === 'Completed' ? 'selected' : ''}>Completed</option>
+                                    <option value="Cancelled" ${booking.status === 'Cancelled' ? 'selected' : ''}>Cancelled</option>
+                                </select>
+                                <button class="btn-glass btn-primary" style="padding: 6px 10px;" onclick="updateBookingStatus(${booking.booking_id}, this.previousElementSibling.value)">
+                                    Update
+                                </button>
+                            </td>
+                        `;
+                        recentBookingsBody.appendChild(row);
+                    });
+                }
+                
+                // Get top LCs from reports
+                const reportsResponse = await fetch('/api/admin/reports', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                if (reportsResponse.ok) {
+                    const reportsData = await reportsResponse.json();
+                    const topLCs = reportsData.reports.top_lcs;
+                    
+                    const topLCsContainer = document.getElementById('top-lcs-container');
+                    topLCsContainer.innerHTML = '';
+                    
+                    topLCs.forEach((lc, index) => {
+                        const lcCard = document.createElement('div');
+                        lcCard.className = 'card';
+                        lcCard.innerHTML = `
+                            <h3>
+                                <span style="color: var(--gold-highlight);">#${index+1}</span> 
+                                ${lc.name}
+                            </h3>
+                            <p>Bookings: <strong>${lc.booking_count}</strong></p>
+                        `;
+                        topLCsContainer.appendChild(lcCard);
+                    });
+                }
+            } catch (error) {
+                console.error('Error loading dashboard data:', error);
+            }
+        }
+
+        // Function to update booking status
+        async function updateBookingStatus(bookingId, newStatus) {
+            if (!confirm('Are you sure you want to update this booking status?')) {
+                return;
+            }
+            
+            try {
+                const response = await fetch(`/api/admin/bookings/${bookingId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ status: newStatus })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    // Reload the dashboard data to reflect changes
+                    loadDashboardData();
+                } else {
+                    alert('Error updating booking: ' + (result.error || 'Unknown error'));
+                }
+            } catch (error) {
+                console.error('Error updating booking status:', error);
+                alert('An error occurred while updating the booking status');
+            }
+        }
+
+        // Load data when page loads
+        document.addEventListener('DOMContentLoaded', loadDashboardData);
+    </script>
+</body>
+</html>

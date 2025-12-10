@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book Now - LCious</title>
+    <link rel="stylesheet" href="/assets/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar glass-container">
+        <a href="/" class="navbar-brand">
+            <span><i class="fas fa-disco-ball"></i></span>
+            LCious
+        </a>
+        <div class="navbar-links">
+            <a href="/">Home</a>
+            <a href="/public/rooms.html">Rooms</a>
+            <a href="/public/lcs.html">LCs</a>
+            <a href="/public/booking.html">Book Now</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <h1 class="neon-text" style="text-align: center; margin-bottom: 30px;">Book Your Karaoke Experience</h1>
+        
+        <form id="booking-form" class="glass-container">
+            <div class="form-group">
+                <label for="room_id" class="form-label">Select Room</label>
+                <select name="room_id" id="room_id" class="form-control" required>
+                    <option value="">Choose a room</option>
+                    <!-- Options will be loaded dynamically -->
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="lc_id" class="form-label">Select LC (Optional)</label>
+                <select name="lc_id" id="lc_id" class="form-control">
+                    <option value="">No LC (Book room only)</option>
+                    <!-- Options will be loaded dynamically -->
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="start_time" class="form-label">Start Time</label>
+                <input type="datetime-local" name="start_time" id="start_time" class="form-control" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="duration" class="form-label">Duration (hours)</label>
+                <select name="duration" id="duration" class="form-control" required>
+                    <option value="">Select duration</option>
+                    <option value="1">1 hour</option>
+                    <option value="2">2 hours</option>
+                    <option value="3">3 hours</option>
+                    <option value="4">4 hours</option>
+                    <option value="5">5 hours</option>
+                    <option value="6">6 hours</option>
+                </select>
+            </div>
+            
+            <div class="booking-summary glass-container">
+                <h3 class="neon-text">Booking Summary</h3>
+                <div class="summary-item">
+                    <span>Room:</span>
+                    <span id="selected-room">-</span>
+                </div>
+                <div class="summary-item">
+                    <span>LC:</span>
+                    <span id="selected-lc">-</span>
+                </div>
+                <div class="summary-item">
+                    <span>Duration:</span>
+                    <span id="selected-duration">-</span>
+                </div>
+                <div class="summary-item">
+                    <span>Start Time:</span>
+                    <span id="selected-start-time">-</span>
+                </div>
+                <div class="summary-item total-amount">
+                    <span>Total Amount:</span>
+                    <span id="total-amount">Rp. 0</span>
+                </div>
+            </div>
+            
+            <div style="text-align: center; margin-top: 20px;">
+                <button type="submit" class="btn-glass btn-primary">
+                    <i class="fas fa-check-circle"></i> Confirm Booking
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <footer class="footer">
+        <p>&copy; 2025 LCious. All rights reserved. | Premium Karaoke Experience</p>
+    </footer>
+
+    <script src="/assets/script.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async function() {
+            const roomSelect = document.getElementById('room_id');
+            const lcSelect = document.getElementById('lc_id');
+            const durationSelect = document.getElementById('duration');
+            const startTimeInput = document.getElementById('start_time');
+            const bookingForm = document.getElementById('booking-form');
+            
+            const selectedRoomSpan = document.getElementById('selected-room');
+            const selectedLCSpan = document.getElementById('selected-lc');
+            const selectedDurationSpan = document.getElementById('selected-duration');
+            const selectedStartTimeSpan = document.getElementById('selected-start-time');
+            const totalAmountSpan = document.getElementById('total-amount');
+            
+            // Load rooms and LCs from API
+            try {
+                // Load available rooms
+                const roomsResponse = await fetch('/api/booking/rooms');
+                if (roomsResponse.ok) {
+                    const roomsData = await roomsResponse.json();
+                    roomsData.rooms.forEach(room => {
+                        if (room.status === 'Available') {
+                            const option = document.createElement('option');
+                            option.value = room.room_id;
+                            option.textContent = `${room.name} - Rp. ${parseInt(room.price_per_hour).toLocaleString()}/hour`;
+                            option.dataset.price = room.price_per_hour;
+                            roomSelect.appendChild(option);
+                        }
+                    });
+                }
+                
+                // Load available LCs
+                const lcsResponse = await fetch('/api/booking/lcs');
+                if (lcsResponse.ok) {
+                    const lcsData = await lcsResponse.json();
+                    lcsData.lcs.forEach(lc => {
+                        const option = document.createElement('option');
+                        option.value = lc.lc_id;
+                        option.textContent = `${lc.name} - Rp. ${parseInt(lc.lc_fee).toLocaleString()}/session`;
+                        option.dataset.fee = lc.lc_fee;
+                        lcSelect.appendChild(option);
+                    });
+                }
+            } catch (error) {
+                console.error('Error loading booking options:', error);
+            }
+            
+            // Update booking summary when form elements change
+            function updateSummary() {
+                // Get selected room
+                const selectedRoom = roomSelect.options[roomSelect.selectedIndex];
+                const roomPrice = selectedRoom ? parseFloat(selectedRoom.getAttribute('data-price')) : 0;
+                selectedRoomSpan.textContent = selectedRoom ? selectedRoom.text.split(' - ')[0] : '-';
+                
+                // Get selected LC
+                const selectedLC = lcSelect.options[lcSelect.selectedIndex];
+                const lcFee = selectedLC && lcSelect.value ? parseFloat(selectedLC.getAttribute('data-fee')) : 0;
+                selectedLCSpan.textContent = selectedLC ? selectedLC.text.split(' - ')[0] : 'None';
+                
+                // Get duration
+                const duration = durationSelect.value;
+                selectedDurationSpan.textContent = duration ? duration + ' hour(s)' : '-';
+                
+                // Get start time
+                selectedStartTimeSpan.textContent = startTimeInput.value ? new Date(startTimeInput.value).toLocaleString() : '-';
+                
+                // Calculate total
+                const total = (roomPrice * (duration || 0)) + lcFee;
+                totalAmountSpan.textContent = 'Rp. ' + total.toLocaleString();
+            }
+            
+            // Add event listeners
+            roomSelect.addEventListener('change', updateSummary);
+            lcSelect.addEventListener('change', updateSummary);
+            durationSelect.addEventListener('change', updateSummary);
+            startTimeInput.addEventListener('change', updateSummary);
+            
+            // Initialize the summary
+            updateSummary();
+            
+            // Handle form submission
+            bookingForm.addEventListener('submit', async function(e) {
+                e.preventDefault();
+                
+                // Get form data
+                const formData = {
+                    user_id: 1, // In a real app, this would come from authentication
+                    room_id: parseInt(roomSelect.value),
+                    lc_id: lcSelect.value ? parseInt(lcSelect.value) : null,
+                    start_time: startTimeInput.value,
+                    duration: parseInt(durationSelect.value)
+                };
+                
+                try {
+                    // Submit booking to API
+                    const response = await fetch('/api/booking/create', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(formData)
+                    });
+                    
+                    const result = await response.json();
+                    
+                    if (result.success) {
+                        // Redirect to success page with booking details
+                        localStorage.setItem('bookingData', JSON.stringify({
+                            bookingId: result.booking_id,
+                            totalAmount: result.total_amount
+                        }));
+                        window.location.href = '/public/success.html';
+                    } else {
+                        alert('Booking failed: ' + result.error);
+                    }
+                } catch (error) {
+                    console.error('Error creating booking:', error);
+                    alert('An error occurred while creating the booking');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
