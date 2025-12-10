@@ -10,7 +10,6 @@ const bookingRoutes = require('./routes/booking');
 const adminRoutes = require('./routes/admin');
 
 const app = express();
-const PORT = process.env.PORT || 3000;
 
 // Middleware
 app.use(cors());
@@ -29,27 +28,26 @@ app.use(session({
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
-// Serve static files
+// Serve static files BEFORE API routes to ensure they're handled first
 app.use('/assets', express.static(path.join(__dirname, 'assets')));
-app.use('/public', express.static(path.join(__dirname, 'public')));
+app.use('/admin', express.static(path.join(__dirname, 'admin')));
+app.use(express.static(path.join(__dirname, 'public')));
 
-// Routes
+// API routes (after static files to avoid conflicts)
 app.use('/api/booking', bookingRoutes);
 app.use('/api/admin', adminRoutes);
 
-// Serve the main application pages
-app.use('/', express.static(path.join(__dirname, 'public')));
+// Catch-all route for SPA (after API routes)
+app.get('*', (req, res) => {
+  // Don't serve index.html for API routes (this should already be handled by the API routes above)
+  // But if an API route wasn't matched, return 404
+  if (req.path.startsWith('/api/')) {
+    return res.status(404).json({ error: 'API endpoint not found' });
+  }
 
-// Admin routes
-app.use('/admin', express.static(path.join(__dirname, 'admin')));
-
-// Default route
-app.get('/', (req, res) => {
+  // For all other routes, serve the main index.html (SPA routing)
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-// Start server
-app.listen(PORT, () => {
-  console.log(`LCious server is running on port ${PORT}`);
-  console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
-});
+// For Vercel: export the app as a serverless function
+module.exports = app;
