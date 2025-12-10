@@ -13,14 +13,14 @@
     "booking",
     "nodejs",
     "express",
-    "mysql",
+    "postgresql",
     "vercel"
   ],
   "author": "LCious Development Team",
   "license": "MIT",
   "dependencies": {
     "express": "^4.18.2",
-    "mysql2": "^3.6.0",
+    "pg": "^8.11.3",
     "dotenv": "^16.3.1",
     "ejs": "^3.1.9",
     "body-parser": "^1.20.2",

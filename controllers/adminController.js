@@ -52,22 +52,23 @@ const adminController = {
       // For this demo, we'll skip authentication for simplicity
 
       // Total revenue
-      const [revenueRows] = await db.execute(
-        'SELECT SUM(total_amount) as total FROM bookings WHERE status = \'Confirmed\''
+      const revenueResult = await db.query(
+        'SELECT SUM(total_amount) as total FROM bookings WHERE status = $1',
+        ['Confirmed']
       );
-      const totalRevenue = revenueRows[0].total || 0;
+      const totalRevenue = parseFloat(revenueResult.rows[0].total) || 0;
 
       // Total bookings by status
-      const [statusRows] = await db.execute(
+      const statusResult = await db.query(
         'SELECT status, COUNT(*) as count FROM bookings GROUP BY status'
       );
       const bookingsByStatus = {};
-      statusRows.forEach(row => {
-        bookingsByStatus[row.status] = row.count;
+      statusResult.rows.forEach(row => {
+        bookingsByStatus[row.status] = parseInt(row.count);
       });
 
       // Top LCs by booking count
-      const [topLCsRows] = await db.execute(`
+      const topLCsResult = await db.query(`
         SELECT lcs.name, COUNT(bookings.lc_id) as booking_count, SUM(bookings.total_amount) as total_revenue
         FROM lcs
         LEFT JOIN bookings ON lcs.lc_id = bookings.lc_id
@@ -78,7 +79,7 @@ const adminController = {
       `);
 
       // Revenue by date (last 7 days)
-      const [revenueByDateRows] = await db.execute(`
+      const revenueByDateResult = await db.query(`
         SELECT DATE(created_at) as date, SUM(total_amount) as daily_revenue
         FROM bookings
         WHERE status = 'Confirmed'
@@ -88,7 +89,7 @@ const adminController = {
       `);
 
       // Total room bookings
-      const [roomBookingsRows] = await db.execute(`
+      const roomBookingsResult = await db.query(`
         SELECT r.name, COUNT(b.booking_id) as booking_count
         FROM rooms r
         LEFT JOIN bookings b ON r.room_id = b.room_id
@@ -102,15 +103,15 @@ const adminController = {
         reports: {
           total_revenue: totalRevenue,
           bookings_by_status: bookingsByStatus,
-          top_lcs: topLCsRows,
-          revenue_by_date: revenueByDateRows,
-          room_popularity: roomBookingsRows
+          top_lcs: topLCsResult.rows,
+          revenue_by_date: revenueByDateResult.rows,
+          room_popularity: roomBookingsResult.rows
         }
       });
     } catch (error) {
       console.error('Error fetching reports:', error);
       // Check if it's a database connection error
-      if (error.code === 'ECONNREFUSED' || error.code === 'ER_ACCESS_DENIED_ERROR') {
+      if (error.code === 'ECONNREFUSED' || error.code === 'ENOTFOUND') {
         res.status(500).json({ error: 'Database connection error. Please check configuration.' });
       } else {
         res.status(500).json({ error: error.message });
@@ -121,7 +122,7 @@ const adminController = {
   // Get all bookings for admin management
   getAllBookings: async (req, res) => {
     try {
-      const [rows] = await db.execute(`
+      const result = await db.query(`
         SELECT b.*, r.name as room_name, l.name as lc_name
         FROM bookings b
         LEFT JOIN rooms r ON b.room_id = r.room_id
@@ -131,13 +132,13 @@ const adminController = {
 
       res.status(200).json({
         success: true,
-        bookings: rows,
-        count: rows.length
+        bookings: result.rows,
+        count: result.rows.length
       });
     } catch (error) {
       console.error('Error fetching all bookings:', error);
       // Check if it's a database connection error
-      if (error.code === 'ECONNREFUSED' || error.code === 'ER_ACCESS_DENIED_ERROR') {
+      if (error.code === 'ECONNREFUSED' || error.code === 'ENOTFOUND') {
         res.status(500).json({ error: 'Database connection error. Please check configuration.' });
       } else {
         res.status(500).json({ error: error.message });
@@ -158,12 +159,12 @@ const adminController = {
       }
 
       // Update booking status
-      const [result] = await db.execute(
-        'UPDATE bookings SET status = ? WHERE booking_id = ?',
+      const result = await db.query(
+        'UPDATE bookings SET status = $1 WHERE booking_id = $2',
         [status, bookingId]
       );
 
-      if (result.affectedRows === 0) {
+      if (result.rowCount === 0) {
         return res.status(404).json({ error: 'Booking not found' });
       }
 
@@ -174,7 +175,7 @@ const adminController = {
     } catch (error) {
       console.error('Error updating booking status:', error);
       // Check if it's a database connection error
-      if (error.code === 'ECONNREFUSED' || error.code === 'ER_ACCESS_DENIED_ERROR') {
+      if (error.code === 'ECONNREFUSED' || error.code === 'ENOTFOUND') {
         res.status(500).json({ error: 'Database connection error. Please check configuration.' });
       } else {
         res.status(500).json({ error: error.message });
@@ -188,12 +189,12 @@ const adminController = {
       const { bookingId } = req.params;
 
       // Delete booking
-      const [result] = await db.execute(
-        'DELETE FROM bookings WHERE booking_id = ?',
+      const result = await db.query(
+        'DELETE FROM bookings WHERE booking_id = $1',
         [bookingId]
       );
 
-      if (result.affectedRows === 0) {
+      if (result.rowCount === 0) {
         return res.status(404).json({ error: 'Booking not found' });
       }
 
@@ -204,7 +205,7 @@ const adminController = {
     } catch (error) {
       console.error('Error deleting booking:', error);
       // Check if it's a database connection error
-      if (error.code === 'ECONNREFUSED' || error.code === 'ER_ACCESS_DENIED_ERROR') {
+      if (error.code === 'ECONNREFUSED' || error.code === 'ENOTFOUND') {
         res.status(500).json({ error: 'Database connection error. Please check configuration.' });
       } else {
         res.status(500).json({ error: error.message });

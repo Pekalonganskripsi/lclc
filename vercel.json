@@ -8,16 +8,17 @@
   ],
   "routes": [
     {
-      "src": "/api/(.*)",
-      "dest": "index.js"
-    },
-    {
-      "src": "/admin/(.*)",
-      "dest": "index.js"
-    },
-    {
       "src": "/(.*)",
       "dest": "index.js"
     }
-  ]
+  ],
+  "env": {
+    "DB_HOST": "db.culdvtsyoxtrkjpfvolk.supabase.co",
+    "DB_USERNAME": "postgres",
+    "DB_PASSWORD": "",  // You need to set your actual Supabase password
+    "DB_NAME": "postgres",
+    "DB_PORT": "5432",
+    "JWT_SECRET": "lcious_jwt_secret",
+    "SESSION_SECRET": "lcious_session_secret"
+  }
 }

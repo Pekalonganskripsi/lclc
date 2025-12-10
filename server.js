@@ -28,24 +28,29 @@ app.use(session({
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
-// Serve static files BEFORE API routes to ensure they're handled first
-app.use('/assets', express.static(path.join(__dirname, 'assets')));
-app.use('/admin', express.static(path.join(__dirname, 'admin')));
-app.use(express.static(path.join(__dirname, 'public')));
+// Serve static files - order is important
+// First serve assets directory (for CSS, JS, images)
+app.use('/assets', express.static(path.join(__dirname, 'assets'), {
+  maxAge: '1y',
+  etag: false
+}));
 
-// API routes (after static files to avoid conflicts)
+// Then serve admin static files
+app.use('/admin', express.static(path.join(__dirname, 'admin')));
+
+// Finally serve public directory (for HTML files and other static assets)
+app.use(express.static(path.join(__dirname, 'public'), {
+  maxAge: '1d'
+}));
+
+// API routes (these should be after static file serving)
 app.use('/api/booking', bookingRoutes);
 app.use('/api/admin', adminRoutes);
 
-// Catch-all route for SPA (after API routes)
-app.get('*', (req, res) => {
-  // Don't serve index.html for API routes (this should already be handled by the API routes above)
-  // But if an API route wasn't matched, return 404
-  if (req.path.startsWith('/api/')) {
-    return res.status(404).json({ error: 'API endpoint not found' });
-  }
-
-  // For all other routes, serve the main index.html (SPA routing)
+// Catch-all route for SPA routing (after API routes)
+app.get(/^(?!\/api\/).*$/, (req, res) => {
+  // This regex matches all routes that don't start with /api/
+  // This ensures API routes are handled by the API middleware first
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
